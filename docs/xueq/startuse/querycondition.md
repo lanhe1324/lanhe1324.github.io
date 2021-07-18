@@ -117,14 +117,14 @@ public static Stone.AQH.QueryCondition ResolverCondition(string jcondition)
 {
     if (string.IsNullOrEmpty(jcondition)) return null;
     var jarr = JArray.Parse(jcondition);           
-    var listExp = jarr.ToObject<ICollection<Stone.AQH.EvalCondition.ConditionExp>>().ToList();            
+    var listExp = jarr.ToObject<ICollection<ExpCondition>>().ToList();            
     var condition = new Stone.AQH.QueryCondition();
     foreach (var n in listExp)
     {
         if (n.Value.IsNullOrEmpty()) continue;               
-        if (n.Arithmetic!=null)
+        if (n.Operator!=null)
         {
-            condition.Add(n.Name, n.Value, n.Arithmetic);
+            condition.Add(n.Name, n.Value, n.Operator);
         }
         else
         {

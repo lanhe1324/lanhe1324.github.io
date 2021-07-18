@@ -123,7 +123,7 @@ public class SysUserConfig : EntityTypeConfiguration<SysUserEntity>
     }    
 ```
 
-## 5. Api操作
+## 5. Api接口
 > 经过以上几个步骤后我们就拥有了Base基类的所有功能了，如果你不需要进行复杂的业务逻辑，那么通过以下Api接口就可以对表进行`增删改查`操作了。
 
 | 接口名 | 描述 |
@@ -222,3 +222,170 @@ export function getComboBox(svcname, id,name) {
   })
 }
 ```
+
+## 6.配置实体字段
+- 可以分别设置Entity和View实体;
+  > View实体作用是展示数据，可以设置字段Visible，字段名等; 
+  > Entity实体对应的是数据表，可以设置字段的有效性验证，必填等;
+
+![](./2021-07-18-10-40-59.png)
+
+## 7.分配权限
+
+- 为角色分配权限
+
+![](./2021-07-17-20-26-49.png)
+
+## 8.添加菜单
+- 添加菜单并配置路由参数和winform程序的地址
+![](./2021-07-18-10-57-33.png)
+
+## 9.添加Web页面
+- 前端vue框架会根据菜单的路由参数动态添加路由;
+- 在views文件里添加对应的页面，并引入mixin基类模块;
+  > 设置svcname="SysUser",查询条件可以根据需要自行添加
+- 基类模块会根据字段配置自动生成视图列表和编辑页面;
+- 要定义页面使用插槽即可;
+  
+```js
+<template>
+  <bs-list-main ref="bslistmain">
+    <template v-slot:search>
+      <el-input
+        v-model="condition.sysdept_Name[0].value"
+        placeholder="部门名称"
+        style="width: 100px"
+        size="mini"
+      />
+       <el-input
+        v-model="condition.createBy[0].value"
+        placeholder="录入人"
+        style="width: 100px"
+        size="mini"
+      />
+         <el-input
+        v-model="condition.sysPosition_Name[0].value"
+        placeholder="职位"
+        style="width: 100px"
+        size="mini"
+      />
+      <el-date-picker
+        v-model="condition.createDate[0].value"
+        type="date"
+        placeholder="开始日期"
+        value-format="yyyy-MM-dd"
+        size="mini"
+      >
+      </el-date-picker>
+      <el-date-picker
+        v-model="condition.createDate[1].value"
+        type="date"
+        placeholder="结束日期"
+        value-format="yyyy-MM-dd"
+        size="mini"
+      >
+      </el-date-picker>      
+    </template>   
+  </bs-list-main>
+</template>
+<script>
+import svcmixin from "@/components/BaseForm/mixins/svc.js";
+const custTools = [];
+export default {
+  name: "SysUser",
+  mixins: [svcmixin], 
+  data() {
+    const defCondition = {
+      createDate: [
+        {
+          name: "createDate",
+          value: this.getDate(-180),
+          operator: "GreaterThanOrEqual",
+        },
+        {
+          name: "createDate",
+          value: this.getDate(),
+          operator: "LessThanOrEqual",
+        },
+      ],
+      sysdept_Name: [{ name: "sysdept_Name", value: "" }],
+      sysPosition_Name:[{name:'sysPosition_Name',value:'',operator:'Contains'}]
+    };
+    return {
+      svcname: "SysUser",
+      previewVisible:false,
+      custTools,
+      defCondition,     
+    };
+  }, 
+};
+</script>
+```
+
+- 视图页面预览
+
+![](./2021-07-18-11-20-25.png)
+
+- 编辑页面预览
+  > 标准的编辑页面自带附件模块
+
+![](./2021-07-18-11-28-54.png)
+
+![](./2021-07-18-11-37-32.png)
+
+
+## 10.添加Winform页面
+
+- 新建`frmSysUser`窗体文件,并添加以下代码
+
+```cs
+public partial class frmSysUser : BaseModules.FormsRib.BaseFormViewEditUI
+    {
+        public XueQ.Service.Context.SysUserService Svc;
+
+        public frmSysUser()
+        {
+            InitializeComponent();
+        }
+        protected override void RegisterData()
+        {
+            base.ViewProvider = BaseModules.FormComponents.BuilerProvider.BuildList(Svc);
+            base.EditProvider = BaseModules.FormComponents.BuilerProvider.BuildEdit(Svc);
+            base.RegisterData();
+        }
+        protected override void AfterServiceStart()
+        {           
+            Utility.DevExpressHelper.XEditor.FillLoolupEdit(this.editorSysUserEntityDeptId, Svc.GetComboBoxData().SysDept());
+
+            Utility.DevExpressHelper.XEditor.FillLoolupEdit(this.editorSysUserEntityPositionId, Svc.GetComboBoxData().SysPosition());           
+
+            Utility.DevExpressHelper.XEditor.FillLoolupEdit(this.editorSysUserEntityRoleGroupId, Svc.GetComboBoxData().SysRoleGroup());
+           
+            this.gridViewEdit.Columns[nameof(SysUserEntity.RoleGroupId)].ColumnEdit = Utility.DevExpressHelper.XEditor.RepositoryLookupEdit(Svc.GetComboBoxData().SysRoleGroup());
+
+       
+            this.gridViewEdit.Columns[nameof(SysUserEntity.DeptId)].ColumnEdit = Utility.DevExpressHelper.XEditor.RepositoryLookupEdit(Svc.GetComboBoxData().SysDept()); 
+
+            this.gridViewEdit.Columns[nameof(SysUserEntity.PositionId)].ColumnEdit = Utility.DevExpressHelper.XEditor.RepositoryLookupEdit(Svc.GetComboBoxData().SysPosition()); 
+        }
+
+        protected override void ToolBarClick(string name, ref bool re)
+        {
+            base.ToolBarClick(name, ref re);
+
+            if (name==nameof(barbtnUpdateDomain))
+            {
+                Utility.ShowBox.ShowWaitForm(this, () => { new XueQ.Service.Context.SysDomainUserService().UpdateUser(); });
+               
+            }
+        }
+    }
+```
+
+- 视图页面
+  
+  ![](./2021-07-18-11-59-58.png)
+
+  - 编辑页面
+
+  ![](./2021-07-18-12-01-15.png)
