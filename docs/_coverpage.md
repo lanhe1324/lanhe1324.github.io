@@ -6,6 +6,6 @@
 
 
 
-[GitHub]()
+[GitHub](https://gitee.com/lanhe1324/xueq)
 [开始阅读](?id=项目结构)
 
