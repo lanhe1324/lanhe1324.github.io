@@ -2,8 +2,8 @@
 
 - 对于EF，是否需要手动Dispose DbContext对象？
 网上的观点有两种:
-> 1. 需要手动Dispose
-> 2. 不需要手动Dispose
+   1. 需要手动Dispose
+   2. 不需要手动Dispose
 
 > [!TIP]
 > 本项目不需要手动Dispose;   

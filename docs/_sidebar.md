@@ -6,6 +6,7 @@
     - [QueryCondition](xueq/startuse/querycondition.md)     
     - [QuerySort](xueq/startuse/querysort.md)   
     - [权限管理](xueq/startuse/permission.md)     
+    - [OA签批](xueq/startuse/workflow.md)   
     - [常见问题](xueq/startuse/problems.md)
 - Service模块
   - [介绍](xueq/service/readme.md?id=主要功能)  

@@ -6,6 +6,7 @@
 - Entity对应数据中实体表，所以必须与数据库中的字段一样，否则运行时会报错。
 - View就好比是数据库里的视图，在这里我们只需要定义在框架中，而不需要在数据库里定义视图了。
 1. 新建`SysUserEntity`，包含3个外键表`SysRole`|`SysDept`|`SysPosition`
+   > [!TIP]
    > 外键实体可以根据业务的需要添加`Virtual`关键字
 ```csharp
 public class SysUserEntity : Base.BaseEntity
@@ -32,9 +33,10 @@ public class SysUserEntity : Base.BaseEntity
     }
 ```
 1. 新建`SysUserView`,视图应是`扁平化`的，只定义需要的外键表字段即可： 
-    - 定义`SysDeptEntity`外键实体`Name`字段，框架会根据定义自动映射：
-      1. 外键实体名_字段名(SysDept_Name) 
-      2. 通过添加标记(`MappedName`("SysDept.Name"))
+   > [!TIP]
+   > 定义`SysDeptEntity`外键实体`Name`字段，框架会根据定义自动映射：
+   >   1. 外键实体名_字段名(`SysDept_Name`) 
+   >   2. 通过添加标记(`MappedName`(`"SysDept.Name"`))
 ```csharp
  public class SysUserView : Base.BaseView
     {       
@@ -109,11 +111,11 @@ public class SysUserConfig : EntityTypeConfiguration<SysUserEntity>
 ```
 
 ## 4. 添加Controller
-> 在MVC项目里添加`SysUserController`,继承`BaseController`。
+> 在MVC项目里添加`SysUserController`,继承`BaseSvcController`。
 > - 由于之前的项目用的是.Net Mvc的框架，就不在新建新的Api项目，直接修改了原有的框架，添加相应Api接口操作数据。
 - 添加SysUserService字段,运行时框架会自动实例化
 ```csharp
- public class SysUserController : Base.BaseController
+ public class SysUserController : Base.BaseSvcController
     {
         public Service.Context.SysUserService Svc;      
         public SysUserController()
@@ -128,28 +130,28 @@ public class SysUserConfig : EntityTypeConfiguration<SysUserEntity>
 
 | 接口名 | 描述 |
 |:----|---|
-|  ApiList   |获取对象集合|
-|  ApiAddNew   |新增|
-|  ApiEdit   |编辑|
-|  ApiDelete   |删除|
-|  ApiSelectComboBox   |获取下拉集合数据|
-|  ApiColConfig   |获取字段配置|
-|  ApiWriteToolbar   |写入工具栏|
-|  ApiExportExcel   |导出Excel|
+|  List   |获取对象集合|
+|  AddNew   |新增|
+|  Edit   |编辑|
+|  Delete   |删除|
+|  SelectComboBox   |获取下拉集合数据|
+|  ColConfig   |获取字段配置|
+|  WriteToolbar   |写入工具栏|
+|  ExportExcel   |导出Excel|
 
 
 ```js
 import request from '@/utils/request'
 export function getCol(svcname, params) {
   return request({
-    url: `/${svcname}/ApiColConfig`,
+    url: `/${svcname}/ColConfig`,
     method: 'get',
     params
   })
 }
 export function getList(svcname, params) {
   return request({
-    url: `/${svcname}/apilist`,
+    url: `/${svcname}/list`,
     method: 'get',
     params
   })
@@ -157,28 +159,28 @@ export function getList(svcname, params) {
 
 export function postList(svcname, data) {
   return request({
-    url: `/${svcname}/apilist`,
+    url: `/${svcname}/list`,
     method: 'post',
     data
   })
 }
 export function getAddNew(svcname, params) {
   return request({
-    url: `/${svcname}/ApiAddNew`,
+    url: `/${svcname}/AddNew`,
     method: 'get',
     params
   })
 }
 export function postAddNew(svcname, data) {
   return request({
-    url: `/${svcname}/ApiAddNew`,
+    url: `/${svcname}/AddNew`,
     method: 'post',
     data
   })
 }
 export function postEdit(svcname, data) {
   return request({
-    url: `/${svcname}/ApiEdit`,
+    url: `/${svcname}/Edit`,
     method: 'post',
     data
   })
@@ -186,28 +188,28 @@ export function postEdit(svcname, data) {
 export function getEdit(svcname, id) {
   const params = { id: id }
   return request({
-    url: `/${svcname}/ApiEdit`,
+    url: `/${svcname}/Edit`,
     method: 'get',
     params
   })
 }
 export function postDelete(svcname, data) {
   return request({
-    url: `/${svcname}/ApiDelete`,
+    url: `/${svcname}/Delete`,
     method: 'post',
     data
   })
 }
 export function postWriteToolbar(svcname, data) {
   return request({
-    url: `/${svcname}/apiWriteToolbar`,
+    url: `/${svcname}/WriteToolbar`,
     method: 'post',
     data
   })
 }
 export function postExportExcel(svcname, data) {
   return request({
-    url: `/${svcname}/ApiExportExcel`,
+    url: `/${svcname}/ExportExcel`,
     method: 'post',
     data,
     responseType: 'blob'
@@ -216,7 +218,7 @@ export function postExportExcel(svcname, data) {
 export function getComboBox(svcname, id,name) {
   const params = { id: id,name:name }
   return request({
-    url: `/${svcname}/ApiSelectComboBox`,
+    url: `/${svcname}/SelectComboBox`,
     method: 'get',
     params
   })
@@ -245,7 +247,7 @@ export function getComboBox(svcname, id,name) {
 - 在views文件里添加对应的页面，并引入mixin基类模块;
   > 设置svcname="SysUser",查询条件可以根据需要自行添加
 - 基类模块会根据字段配置自动生成视图列表和编辑页面;
-- 要定义页面使用插槽即可;
+- 要自定义页面使用插槽即可;
   
 ```js
 <template>
@@ -386,6 +388,6 @@ public partial class frmSysUser : BaseModules.FormsRib.BaseFormViewEditUI
   
   ![](./2021-07-18-11-59-58.png)
 
-  - 编辑页面
+  - 编辑页面 
 
-  ![](./2021-07-18-12-01-15.png)
+  ![](2021-07-28-08-31-07.png)

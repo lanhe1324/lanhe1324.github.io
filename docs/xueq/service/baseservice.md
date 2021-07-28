@@ -8,7 +8,7 @@ public abstract class BaseService<T,V>: AbsService,IService where T : class, new
 {
      public BaseService()
       {            
-          this.DefualtQueryCondition = new QueryCondition();
+          
       }
 }
 ```
@@ -22,7 +22,18 @@ protected ConStringName ConStringName = ConStringName.Default;
 ## DefualtQuerySort
 - 默认值为主键降序,可以在实现类的构造函数里添加排序字段
 ```cs
-protected QuerySort DefualtQuerySort { get; set; }
+private QuerySort _defualtQuerySort { get; set; }
+protected QuerySort DefualtQuerySort
+{
+    get
+    {
+        if (this._defualtQuerySort == null)
+        {
+            this._defualtQuerySort = new QuerySort();
+        }
+        return this._defualtQuerySort;
+    }
+}
 protected QuerySort GetDefualtQuerySort 
 { 
     get 
@@ -31,18 +42,28 @@ protected QuerySort GetDefualtQuerySort
     } 
 }
 public SysMenuService()
-{
-    base.ConStringName = XueQ.Model.XEnum.ConStringName.Default;
-    base.DefualtQuerySort = new Stone.AQH.QuerySort().Add(nameof(SysMenuEntity.FatherId), Stone.AQH.SortEnum.Aesc);  
+{   
+    base.DefualtQuerySort.Add(nameof(SysMenuEntity.FatherId), Stone.AQH.SortEnum.Aesc);  
 }
-
 ```
 
 ## DefualtQueryCondition
 - 默认查询条件，可以在实现类的构造函数添加具体条件
+  
 
 ```cs
-protected QueryCondition DefualtQueryCondition { get; set; }
+private QueryCondition _defualtQueryCondition { get; set; }
+protected QueryCondition DefualtQueryCondition
+{
+    get
+    {
+        if (this._defualtQueryCondition == null)
+        {
+            this._defualtQueryCondition = new QueryCondition();
+        }
+        return this._defualtQueryCondition;
+    }
+}
 public SysMenuService()
 {       
     base.DefualtQueryCondition.Add(nameof(SysMenuEntity.IsDevelop), false);    
