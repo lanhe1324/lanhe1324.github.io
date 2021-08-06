@@ -50,6 +50,7 @@
 -  Entity Framework  
 -  AddFlow  流程图软件
 -  MSSQL 
+-  WCF
 
 
 ## 开发模式
